@@ -9,7 +9,7 @@ export class Permission extends BaseEntity {
 
   @ManyToMany(() => Role, role => role.permissions)
   @JoinTable({
-    name: "permisson_role",
+    name: "permission_role",
     joinColumn: {
       name: "permissionId",
       referencedColumnName: "id"

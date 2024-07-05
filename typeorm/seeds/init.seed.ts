@@ -7,6 +7,7 @@ import { PermissionFactory } from '../../typeorm/factories/permission.factory';
 import RolePermissionSeeder from './role-permission.seed';
 import UserSeeder from './user.seed';
 import { UserFactory } from '../../typeorm/factories/user.factory';
+import DeleteSeeder from './delete.seed';
 
 export default class InitSeeder implements Seeder {
   public async run(
@@ -16,6 +17,12 @@ export default class InitSeeder implements Seeder {
     await runSeeders(dataSource, {
       seeds: [UserSeeder, RoleSeeder, PermissionSeeder, RolePermissionSeeder],
       factories: [UserFactory, RoleFactory, PermissionFactory],
+      /* delete data
+      seeds: [DeleteSeeder],
+      factories: [],
+      end delete data */
+      // seeds: [UserSeeder],
+      // factories: [UserFactory],
     });
   }
 }

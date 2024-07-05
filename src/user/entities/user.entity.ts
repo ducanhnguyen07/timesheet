@@ -7,6 +7,9 @@ import { Request } from '../../request/entities/request.entity';
 
 @Entity('user')
 export class User extends BaseEntity {
+  static delete(arg0: {}) {
+    throw new Error("Method not implemented.");
+  }
   @Column({ name: 'name' })
   name: string;
 
