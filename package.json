@@ -18,13 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "typeorm:create-migrations": "npm run typeorm -- migration:create",
     "typeorm:generate-migrations": "npm run typeorm -- -d ./typeorm/typeorm.config.ts migration:generate",
     "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./typeorm/typeorm.config.ts",
     "typeorm:revert-migrations": "npm run typeorm migration:revert -- -d ./typeorm/typeorm.config.ts",
-
     "seed:run": "ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d ./typeorm/typeorm.config.ts"
   },
   "dependencies": {
@@ -43,6 +41,7 @@
     "cache-manager": "^5.6.1",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
+    "cloudinary": "^2.2.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "exceljs": "^4.4.0",
