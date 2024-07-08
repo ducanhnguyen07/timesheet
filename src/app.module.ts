@@ -17,6 +17,8 @@ import { AuthGuard } from './auth/guard/auth.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerConfig } from './configs/throttler.config';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ScheduleModule } from '@nestjs/schedule';
+import { EmailModule } from './mail/email.module';
 
 @Module({
   imports: [
@@ -29,11 +31,13 @@ import { CacheModule } from '@nestjs/cache-manager';
     DatabaseModule,
     RequestModule,
     AuthModule,
+    EmailModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     ThrottlerModule.forRootAsync(ThrottlerConfig),
     CacheModule.register({ isGlobal: true }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

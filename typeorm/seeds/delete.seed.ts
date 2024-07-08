@@ -11,7 +11,7 @@ export default class DeleteSeeder {
     await dataSource
       .createQueryBuilder()
       .delete()
-      .from('role')
+      .from('user')
       .execute();
   }
 }

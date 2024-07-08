@@ -88,8 +88,8 @@ export class UserController {
   @SetMetadata('permissions', ['user_read'])
   @Get('profile/info')
   @ResponseMessage('Get profile user!')
-  getProfile(@RequestUser() user: any) {
-    return user;
+  getProfile(@RequestUser() user: any, @Query() query: any): Promise<ResponseUserDto | string> {
+    return this.userService.getInfo(user);
   }
 
   @SetMetadata('permissions', ['user_read'])

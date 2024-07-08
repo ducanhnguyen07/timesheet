@@ -15,13 +15,13 @@ export default class InitSeeder implements Seeder {
     factoryManager: SeederFactoryManager,
   ): Promise<any> {
     await runSeeders(dataSource, {
-      seeds: [RoleSeeder, PermissionSeeder, RolePermissionSeeder],
-      factories: [RoleFactory, PermissionFactory],
+      // seeds: [RoleSeeder, PermissionSeeder, RolePermissionSeeder],
+      // factories: [RoleFactory, PermissionFactory],
 
       // delete data
-      // seeds: [DeleteSeeder],
-      // factories: [],
-      // end delete data 
+      seeds: [DeleteSeeder],
+      factories: [],
+      // end delete data
       
       // seeds: [UserSeeder],
       // factories: [UserFactory],

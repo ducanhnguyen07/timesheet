@@ -3,6 +3,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/request/create-user.dto';
 import { UpdateUserDto } from './dto/request/update-user.dto';
@@ -41,6 +42,8 @@ export class UserService {
 
     private readonly paginationHelper: PaginationHelper,
   ) {}
+
+  private readonly logger = new Logger(UserService.name);
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -253,6 +256,20 @@ export class UserService {
 
       return plainToInstance(ResponseUserDto, responseUser, {
         excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      console.log(error);
+      return 'Failed!';
+    }
+  };
+
+  getInfo = async (user: any): Promise<ResponseUserDto | string> => {
+    try {
+      const reqUser = await this.userRepository.findOne({
+        where: { id: user.id }
+      });
+      return plainToInstance(ResponseUserDto, reqUser, {
+        excludeExtraneousValues: true
       });
     } catch (error) {
       console.log(error);

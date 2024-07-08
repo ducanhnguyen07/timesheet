@@ -9,6 +9,7 @@ import { PaginationHelper } from '../helper/pagination.helper';
 import { RoleModule } from '../role/role.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerConfig } from '../configs/upload-multer.config';
+import { MAILER_OPTIONS, MailerService } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
