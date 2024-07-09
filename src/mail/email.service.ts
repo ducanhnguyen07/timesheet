@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { MailerService } from '@nestjs-modules/mailer'; // Hoặc thư viện gửi email bạn sử dụng
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class EmailService {
@@ -8,7 +8,7 @@ export class EmailService {
 
   constructor(private readonly mailerService: MailerService) {}
 
-  @Cron(CronExpression.EVERY_30_SECONDS, { name: 'send mail to user' })
+  // @Cron(CronExpression.EVERY_30_SECONDS, { name: 'send mail to user' })
   async handleCron() {
     this.logger.debug('Send mail to user...');
     try {

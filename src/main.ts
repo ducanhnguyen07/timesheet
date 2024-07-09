@@ -14,6 +14,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
+  app.enableCors();
+
   // swagger-ui
   configSwagger(app);
 

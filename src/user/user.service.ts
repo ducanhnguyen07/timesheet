@@ -24,17 +24,17 @@ import { Workbook } from 'exceljs';
 import * as tmp from 'tmp';
 import * as XLSX from 'xlsx';
 import * as fs from 'fs';
-import { USER_PASSWORD_DEFAULT } from 'src/common/constant/upload-file.constant';
+import { USER_PASSWORD_DEFAULT } from '../common/constant/upload-file.constant';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Project)
-    private readonly projectRepository: Repository<Project>,
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Task>,
 
