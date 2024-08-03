@@ -45,4 +45,7 @@ export class User extends BaseEntity {
   @OneToMany(() => Request, (request) => request.userId)
   requests: Request[];
   createdUser: Task;
+
+  @Column({ name: 'refreshToken', default: '' })
+  refreshToken: string;
 }

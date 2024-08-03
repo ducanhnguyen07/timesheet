@@ -1,5 +1,5 @@
 import { Expose, Transform } from "class-transformer";
-import { TimesheetStatusConstant } from "../../../common/constant/timesheet.constant";
+import { StatusConstant } from "../../../../src/common/constant/status.constant";
 import { IsNumber, IsString, IsUUID } from "class-validator";
 
 export class DeleteTimesheetDto {
@@ -8,7 +8,7 @@ export class DeleteTimesheetDto {
   id: string;
 
   @Expose()
-  @Transform(({ value }) => TimesheetStatusConstant[value], { toClassOnly: true })
+  @Transform(({ value }) => StatusConstant[value], { toClassOnly: true })
   status: number
 
   @Expose()

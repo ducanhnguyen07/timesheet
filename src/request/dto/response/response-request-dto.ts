@@ -1,7 +1,8 @@
-import { Expose, Transform } from "class-transformer";
-import { IsNumber, IsString, IsUUID } from "class-validator";
+import { Expose, Transform, Type } from "class-transformer";
+import { IsDate, IsNumber, IsString, IsUUID } from "class-validator";
 import { RequestType } from "../../../common/constant/request-type.constant";
 import { ApiProperty } from "@nestjs/swagger";
+import { StatusConstant } from "../../../../src/common/constant/status.constant";
 
 export class ResponseRequestDto {
   @Expose()
@@ -20,12 +21,22 @@ export class ResponseRequestDto {
   type: number
 
   @Expose()
+  @IsDate()
+  @Type(() => Date)
+  @ApiProperty()
+  requestDay: Date
+
+  @Expose()
   @IsNumber()
   @ApiProperty()
   time: number
 
   @Expose()
+  @Transform(({ value }) => StatusConstant[value], { toClassOnly: true })
+  status: number
+
+  @Expose()
   @IsUUID('all', { each: true })
   @ApiProperty()
-  timesheetId: string
+  userId: string
 }

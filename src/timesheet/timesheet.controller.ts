@@ -6,17 +6,20 @@ import { ResponseTimesheetDto } from './dto/response/response-timesheet-dto';
 import { DeleteTimesheetDto } from './dto/response/delete-timesheet-dto';
 import { RolesPermissionsGuard } from '../auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { RequestUser } from 'decorator/customize';
 
 @Controller('v1/timesheets')
 @ApiTags('timesheets')
 @ApiBearerAuth()
 @UseGuards(RolesPermissionsGuard)
 export class TimesheetController {
-  constructor(private readonly timesheetService: TimesheetService) {}
+  constructor(
+    private readonly timesheetService: TimesheetService,
+  ) {}
 
   @Post('create')
   @SetMetadata('permissions', ['timesheet_create'])
-  create(@Body() createTimesheetDto: CreateTimesheetDto): Promise<ResponseTimesheetDto | string> {
+  async create(@Body() createTimesheetDto: CreateTimesheetDto): Promise<ResponseTimesheetDto | string> {
     return this.timesheetService.create(createTimesheetDto);
   }
 
@@ -26,6 +29,12 @@ export class TimesheetController {
     return this.timesheetService.findAll();
   }
 
+  @Get('own-timesheet')
+  @SetMetadata('permissions', ['user_read_own_timesheet'])
+  getOwnTimesheet(@RequestUser() user: any)  {
+    return this.timesheetService.getOwnTimesheet(user);
+  }
+
   @Get(':id')
   @SetMetadata('permissions', ['timesheet_read'])
   findOne(@Param('id') id: string): Promise<ResponseTimesheetDto | string> {
@@ -33,7 +42,7 @@ export class TimesheetController {
   }
 
   @Patch('update/:id')
-  @SetMetadata('permissions', ['timesheet_update'])
+  @SetMetadata('permissions', ['timesheet_approve'])
   update(@Param('id') id: string, @Body() updateTimesheetDto: UpdateTimesheetDto): Promise<ResponseTimesheetDto | string> {
     return this.timesheetService.update(id, updateTimesheetDto);
   }

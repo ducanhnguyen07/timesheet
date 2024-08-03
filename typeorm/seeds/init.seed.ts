@@ -18,10 +18,10 @@ export default class InitSeeder implements Seeder {
       // seeds: [RoleSeeder, PermissionSeeder, RolePermissionSeeder],
       // factories: [RoleFactory, PermissionFactory],
 
-      // delete data
+      /* delete data */
       seeds: [DeleteSeeder],
       factories: [],
-      // end delete data
+      /* end delete data */
       
       // seeds: [UserSeeder],
       // factories: [UserFactory],

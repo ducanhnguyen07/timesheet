@@ -23,18 +23,26 @@ import { ResponseTaskDto } from '../task/dto/response/response-task-dto';
 import { RolesPermissionsGuard } from 'src/auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ExcelFileConfig, FileConfig } from '../common/constant/upload-file.constant';
+import {
+  ExcelFileConfig,
+  FileConfig,
+} from '../common/constant/upload-file.constant';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { RequestUser, ResponseMessage } from 'decorator/customize';
 import { Response } from 'express';
+import { multerConfig } from '../../src/configs/upload-multer.config';
+import { LoggerService } from '../../src/logging/log.service';
 
 @Controller('v1/users')
 @ApiTags('users')
 @ApiBearerAuth()
 @UseGuards(RolesPermissionsGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
   @SetMetadata('permissions', ['user_create'])
   @Post('create')
@@ -45,14 +53,20 @@ export class UserController {
   @SetMetadata('permissions', ['user_read'])
   @Get('')
   @ResponseMessage('Find all user!')
-  findAll(
-    @Query('limit') limit: number,
-    @Query('page') page: number,
-  ): Promise<ResponseUserDto[]> {
+  findAll(@Query('limit') limit: number, @Query('page') page: number) {
+    this.loggerService.logInfo('Find all user');
     return this.userService.findAll({ limit, page });
   }
 
   @SetMetadata('permissions', ['user_read'])
+  @Get('all-users')
+  @ResponseMessage('Find user list')
+  getUserList() {
+    return this.userService.getAll();
+  }
+
+  @SetMetadata('permissions', ['user_read'])
+  @SkipThrottle({ default: true })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<ResponseUserDto | string> {
     return this.userService.findOne(id);
@@ -73,6 +87,13 @@ export class UserController {
     return this.userService.deleteOne(id);
   }
 
+  @SetMetadata('permissions', ['user_read_own_timesheet'])
+  @Get('role/own-permission')
+  @ResponseMessage('Get own permission')
+  getOwnPermission(@RequestUser() user: any) {
+    return this.userService.getOwnPermission(user);
+  }
+
   @SetMetadata('permissions', ['user_read'])
   @Get('projects/:id')
   findProject(@Param('id') id: string) {
@@ -85,10 +106,13 @@ export class UserController {
     return this.userService.findTask(id);
   }
 
-  @SetMetadata('permissions', ['user_read'])
+  @SetMetadata('permissions', ['user_read_own_timesheet'])
   @Get('profile/info')
   @ResponseMessage('Get profile user!')
-  getProfile(@RequestUser() user: any, @Query() query: any): Promise<ResponseUserDto | string> {
+  getProfile(
+    @RequestUser() user: any,
+    @Query() query: any,
+  ): Promise<ResponseUserDto | string> {
     return this.userService.getInfo(user);
   }
 
@@ -102,15 +126,22 @@ export class UserController {
     return this.userService.getWorkingTime(id);
   }
 
-  @SetMetadata('permissions', ['user_update'])
-  @Post('upload-avatar/:id')
+  @SetMetadata('permissions', ['user_read_own_timesheet'])
+  @Get('working-time/my-working-time/get-time')
+  @ResponseMessage('Get working-time!')
+  getOwnWorkingTime(@RequestUser() user: any): Promise<number> {
+    return this.userService.getOwnWorkingTime(user);
+  }
+
+  @SetMetadata('permissions', ['user_read_own_timesheet'])
+  @Post('upload-avatar')
   @UseInterceptors(FileInterceptor('file'))
   uploadAvatar(
-    @Param('id') id: string,
+    @RequestUser() user: any,
     @UploadedFile(new ParseFilePipe(FileConfig))
     file: Express.Multer.File,
   ) {
-    return this.userService.uploadAvatar(id, file);
+    return this.userService.uploadAvatar(user, file);
   }
 
   @SetMetadata('permissions', ['user_read'])
@@ -123,7 +154,7 @@ export class UserController {
 
   @SetMetadata('permissions', ['user_read'])
   @Post('excels/import/all-users')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerConfig))
   async importExcel(
     @UploadedFile(new ParseFilePipe(ExcelFileConfig))
     file: Express.Multer.File,

@@ -2,6 +2,7 @@ const PermissionConstant = [
   // user
   "user_create",
   "user_read",
+  "user_read_own_timesheet",
   "user_update",
   "user_delete",
 
@@ -22,6 +23,7 @@ const PermissionConstant = [
   "timesheet_read",
   "timesheet_update",
   "timesheet_delete",
+  'timesheet_approve',
 
   // request
   "request_create",

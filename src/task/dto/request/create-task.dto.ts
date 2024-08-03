@@ -35,9 +35,9 @@ export class CreateTaskDto {
   @ApiProperty()
   userId: string;
 
-  @Expose()
-  @IsArray()
-  @IsUUID('all', { each: true })
-  @ApiProperty()
-  timesheetIds: string[];
+  // @Expose()
+  // @IsArray()
+  // @IsUUID('all', { each: true })
+  // @ApiProperty()
+  // timesheetIds: string[];
 }

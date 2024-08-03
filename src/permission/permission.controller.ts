@@ -17,16 +17,4 @@ export class PermissionController {
   create(@Body() createPermissionDto: CreatePermissionDto): Promise<ResponsePermissionDto | string> {
     return this.permissionService.create(createPermissionDto);
   }
-
-  @Get()
-  @SetMetadata('permissions', ['permisson_read'])
-  findAll() {
-    return this.permissionService.findAll();
-  }
-
-  @Get(':id')
-  @SetMetadata('permissions', ['permisson_read'])
-  findOne(@Param('id') id: string) {
-    return this.permissionService.findOne(+id);
-  } 
 }

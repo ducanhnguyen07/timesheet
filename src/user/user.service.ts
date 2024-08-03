@@ -25,6 +25,10 @@ import * as tmp from 'tmp';
 import * as XLSX from 'xlsx';
 import * as fs from 'fs';
 import { USER_PASSWORD_DEFAULT } from '../common/constant/upload-file.constant';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryResponse } from 'src/configs/cloudinary.response';
+import RolePermission from '../../src/common/constant/role-permission.constant';
+const streamifier = require('streamifier');
 
 @Injectable()
 export class UserService {
@@ -90,6 +94,8 @@ export class UserService {
     try {
       const objPagination = this.paginationHelper.getPagination(pagination);
 
+      const amountUser = await this.userRepository.count();
+
       const listUser = await this.userRepository.find({
         skip: (objPagination.currentPage - 1) * objPagination.limitItem,
         take: objPagination.limitItem,
@@ -101,7 +107,23 @@ export class UserService {
         }),
       );
 
-      return responseListUser;
+      return { responseListUser, amountUser };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getAll() {
+    try {
+      const userList = await this.userRepository.find({});
+
+      const responseUserList = userList.map((user) =>
+        plainToInstance(ResponseUserDto, user, {
+          excludeExtraneousValues: true,
+        }),
+      );
+
+      return responseUserList;
     } catch (error) {
       console.log(error);
     }
@@ -175,6 +197,12 @@ export class UserService {
     }
   }
 
+  getOwnPermission = async (user: any) => {
+    const userPermission: number = user.roles;
+    
+    return RolePermission[userPermission];
+  };
+
   findTask = async (id: string): Promise<ResponseTaskDto[] | string> => {
     try {
       const taskList = await this.taskRepository
@@ -247,29 +275,66 @@ export class UserService {
     }
   };
 
-  uploadAvatar = async (id: string, file: Express.Multer.File) => {
+  getOwnWorkingTime = async (user: any): Promise<number> => {
     try {
-      const user = await this.userRepository.findOne({ where: { id: id } });
+      const userId: string = user.id;
+      const timesheetList = await this.userRepository
+        .createQueryBuilder('user')
+        .innerJoinAndSelect('user.tasks', 'task')
+        .innerJoinAndSelect('task.timesheets', 'timesheet')
+        .where('user.id = :userId', { userId })
+        .getMany()
+        .then((tasks) =>
+          tasks.flatMap((task) => task.tasks.flatMap((task) => task.timesheets)),
+        );
 
-      user.avatar = `public/${file.filename}`;
-      const responseUser = await this.userRepository.save(user);
+      let workingTime: number = 0;
+      for (const timesheet of timesheetList) {
+        if(timesheet.status == 1) {
+          workingTime += timesheet.workingTime;
+        }
+      }
 
-      return plainToInstance(ResponseUserDto, responseUser, {
-        excludeExtraneousValues: true,
-      });
+      return workingTime;
     } catch (error) {
       console.log(error);
-      return 'Failed!';
     }
   };
+
+  uploadAvatar(user: any, file: Express.Multer.File) {
+    if (!file || !file.path) {
+      throw new Error('File is undefined or empty');
+    }
+
+    const uploadImagePromise = new Promise<CloudinaryResponse>(
+      (resolve, reject) => {
+        cloudinary.uploader.upload(file.path, async (error, result) => {
+          if (error) return reject(error);
+
+          user.avatar = result.secure_url;
+          try {
+            await this.userRepository.save(user);
+            resolve(result);
+          } catch (saveError) {
+            console.error(saveError);
+            reject(saveError);
+          }
+        });
+      },
+    );
+
+    return plainToInstance(ResponseUserDto, user, {
+      excludeExtraneousValues: true,
+    });
+  }
 
   getInfo = async (user: any): Promise<ResponseUserDto | string> => {
     try {
       const reqUser = await this.userRepository.findOne({
-        where: { id: user.id }
+        where: { id: user.id },
       });
       return plainToInstance(ResponseUserDto, reqUser, {
-        excludeExtraneousValues: true
+        excludeExtraneousValues: true,
       });
     } catch (error) {
       console.log(error);
@@ -345,17 +410,19 @@ export class UserService {
         const user = new User();
         user.name = row[0]?.toString() || '';
         user.email = row[1]?.toString() || '';
-        user.address = row[2]?.toString() || ''; 
+        user.address = row[2]?.toString() || '';
         user.gender = row[3]?.toString() || '';
         user.branch = parseInt(row[4]) || 0;
-        
+
         user.password = this.getHashPassword(USER_PASSWORD_DEFAULT);
 
         const createdUser = await this.userRepository.save(user);
 
-        responseUsers.push(plainToInstance(ResponseUserDto, createdUser, {
-          excludeExtraneousValues: true
-        }));
+        responseUsers.push(
+          plainToInstance(ResponseUserDto, createdUser, {
+            excludeExtraneousValues: true,
+          }),
+        );
       }
       fs.unlinkSync(filePath);
 
@@ -364,6 +431,17 @@ export class UserService {
       console.error(error);
       return 'Failed!';
     }
+  };
+
+  findUserByToken = async (
+    refreshToken: string,
+  ): Promise<User | undefined> => {
+    const userByToken = await this.userRepository.findOne({
+      where: {
+        refreshToken: refreshToken,
+      },
+    });
+    return userByToken;
   };
 
   getHashPassword = (plain: string): string => {

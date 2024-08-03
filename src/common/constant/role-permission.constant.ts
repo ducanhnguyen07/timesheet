@@ -2,14 +2,19 @@ import { RoleConstant } from './role.constant';
 
 const RolePermission = {
   [RoleConstant.USER]: [
+    // user
+    "user_read_own_timesheet",
+
     // timesheet
     'timesheet_create',
-    'timesheet_read',
     'timesheet_delete',
 
+    // task
+    'task_read_own',
+
     // request
+    'own_request_read',
     'request_create',
-    'request_read',
     'request_delete',
   ],
 
@@ -19,6 +24,7 @@ const RolePermission = {
     'user_read',
     'user_update',
     'user_delete',
+    "user_read_own_timesheet",
 
     // project
     'project_create',
@@ -27,6 +33,7 @@ const RolePermission = {
     'project_delete',
 
     // task
+    'task_read_own',
     'task_create',
     'task_read',
     'task_update',
@@ -37,8 +44,10 @@ const RolePermission = {
     'timesheet_read',
     'timesheet_update',
     'timesheet_delete',
+    'timesheet_approve',
 
     // request
+    'own_request_read',
     'request_create',
     'request_read',
     'request_update',
@@ -51,6 +60,7 @@ const RolePermission = {
     'user_read',
     'user_update',
     'user_delete',
+    "user_read_own_timesheet",
 
     // project
     'project_create',
@@ -59,6 +69,7 @@ const RolePermission = {
     'project_delete',
 
     // task
+    'task_read_own',
     'task_create',
     'task_read',
     'task_update',
@@ -69,8 +80,10 @@ const RolePermission = {
     'timesheet_read',
     'timesheet_update',
     'timesheet_delete',
+    'timesheet_approve',
 
     // request
+    'own_request_read',
     'request_create',
     'request_read',
     'request_update',

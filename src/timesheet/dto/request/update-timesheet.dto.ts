@@ -1,12 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateTimesheetDto } from './create-timesheet.dto';
 import { Expose, Transform } from 'class-transformer';
-import { TimesheetStatusConstant } from '../../../common/constant/timesheet.constant';
+import { StatusConstant } from '../../../../src/common/constant/status.constant';
 import { IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class UpdateTimesheetDto extends PartialType(CreateTimesheetDto) {
   @Expose()
-  @Transform(({ value }) => TimesheetStatusConstant[value], { toClassOnly: true })
+  @Transform(({ value }) => StatusConstant[value], { toClassOnly: true })
   status: number
 
   @Expose()

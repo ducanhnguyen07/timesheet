@@ -12,13 +12,16 @@ import { RequestModule } from './request/request.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerConfig } from './configs/throttler.config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './mail/email.module';
+import { LoggerService } from './logging/log.service';
+import { LoggingInterceptor } from './common/intercepter/logging.interceptor';
+
 
 @Module({
   imports: [
@@ -52,6 +55,11 @@ import { EmailModule } from './mail/email.module';
       useClass: ThrottlerGuard
     },
     JwtService,
+    LoggerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {}

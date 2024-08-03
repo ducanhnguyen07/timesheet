@@ -5,6 +5,7 @@ import { UpdateTaskDto } from './dto/request/update-task.dto';
 import { ResponseTaskDto } from './dto/response/response-task-dto';
 import { RolesPermissionsGuard } from '../auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { RequestUser } from 'decorator/customize';
 
 @Controller('v1/tasks')
 @ApiTags('tasks')
@@ -21,8 +22,14 @@ export class TaskController {
 
   @Get()
   @SetMetadata('permissions', ['task_read'])
-  findAll(): Promise<ResponseTaskDto[] | string> {
+  findAll() {
     return this.taskService.findAll();
+  }
+
+  @Get('own-task')
+  @SetMetadata('permissions', ['task_read_own'])
+  getOwnTask(@RequestUser() user: any) {
+    return this.taskService.getOwnTask(user);
   }
 
   @Get(':id')

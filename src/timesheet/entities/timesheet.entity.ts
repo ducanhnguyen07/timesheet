@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../../common/entity/base.entity";
-import { TimesheetStatusConstant } from "../../common/constant/timesheet.constant";
+import { StatusConstant } from "../../../src/common/constant/status.constant";
 import { Task } from "../../task/entities/task.entity";
 
 @Entity('timesheet')
@@ -8,8 +8,8 @@ export class Timesheet extends BaseEntity {
   @Column({
     name: 'status',
     type: "enum",
-    enum: TimesheetStatusConstant,
-    default: TimesheetStatusConstant.PENDING,
+    enum: StatusConstant,
+    default: StatusConstant.PENDING,
   })
   status: number
 
