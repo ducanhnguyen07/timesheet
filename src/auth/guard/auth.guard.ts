@@ -1,12 +1,17 @@
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from 'decorator/customize';
+import { IS_PUBLIC_KEY } from '../../../decorator/customize';
 import { JwtService } from '@nestjs/jwt';
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
+import { RedisService } from '../../../src/redis/redis.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+    private readonly redisService: RedisService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -14,7 +19,7 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) {
-      // 💡 See this condition
+      // See this condition
       return true;
     }
 
@@ -23,15 +28,21 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
+
+    const oldAccessToken = await this.redisService.getHash('OLD_ACCESS_TOKEN', token);
+    if(oldAccessToken) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_ACCESS_TOKEN_SECRET,
       });
       request['user'] = payload;
-
     } catch {
       throw new UnauthorizedException();
     }
+
     return true;
   }
 

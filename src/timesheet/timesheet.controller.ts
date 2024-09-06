@@ -6,7 +6,7 @@ import { ResponseTimesheetDto } from './dto/response/response-timesheet-dto';
 import { DeleteTimesheetDto } from './dto/response/delete-timesheet-dto';
 import { RolesPermissionsGuard } from '../auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { RequestUser } from 'decorator/customize';
+import { RequestUser } from '../../decorator/customize';
 
 @Controller('v1/timesheets')
 @ApiTags('timesheets')
@@ -37,7 +37,7 @@ export class TimesheetController {
 
   @Get(':id')
   @SetMetadata('permissions', ['timesheet_read'])
-  findOne(@Param('id') id: string): Promise<ResponseTimesheetDto | string> {
+  findOne(@Param('id') id: string) {
     return this.timesheetService.findOne(id);
   }
 

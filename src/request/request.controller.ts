@@ -6,7 +6,7 @@ import { ResponseRequestDto } from './dto/response/response-request-dto';
 import { DeleteRequestDto } from './dto/response/delete-request.dto';
 import { RolesPermissionsGuard } from '../auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { RequestUser } from 'decorator/customize';
+import { RequestUser } from '../../decorator/customize';
 
 @Controller('v1/requests')
 @ApiTags('requests')
@@ -41,7 +41,7 @@ export class RequestController {
 
   @Patch('update/:id')
   @SetMetadata('permissions', ['request_update'])
-  update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto): Promise<ResponseRequestDto | string> {
+  update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto): Promise<ResponseRequestDto> {
     return this.requestService.update(id, updateRequestDto);
   }
 

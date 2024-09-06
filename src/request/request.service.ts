@@ -122,7 +122,7 @@ export class RequestService {
   async update(
     id: string,
     updateRequestDto: UpdateRequestDto,
-  ): Promise<ResponseRequestDto | string> {
+  ): Promise<ResponseRequestDto> {
     try {
       const updateRequest = await this.requestRepository.findOne({
         where: { id: id },
@@ -141,7 +141,6 @@ export class RequestService {
       return responseRequest;
     } catch (error) {
       console.log(error);
-      return 'Failed!';
     }
   }
 

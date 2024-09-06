@@ -1,16 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MailerService } from '@nestjs-modules/mailer';
+import { LoggerService } from '../../src/logging/log.service';
 
 @Injectable()
 export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
-
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
   // @Cron(CronExpression.EVERY_30_SECONDS, { name: 'send mail to user' })
   async handleCron() {
-    this.logger.debug('Send mail to user...');
+    this.loggerService.logInfo('Send mail to user...');
     try {
       await this.mailerService.sendMail({
         to: process.env.EMAIL_TEST,
@@ -19,9 +21,9 @@ export class EmailService {
         text: 'This is a test email from NestJS cron job.',
       });
 
-      this.logger.debug('Email sent successfully!');
+      this.loggerService.logInfo('Email sent successfully!');
     } catch (error) {
-      this.logger.error('Error sending email:', error);
+      this.loggerService.logError('Error sending email:', error);
     }
   }
 }

@@ -17,6 +17,20 @@ export default class UserSeeder {
       name: 'admin-seed',
       password : hashSync('123', salt),
       email: "admin.seed@gmail.com",
+      address: "123 Admin St.",
+      gender: "male",
+      branch: 1,  // Assuming branch 1 corresponds to a valid branch in BranchConstant
+      avatar: "",
+      stWork: "08:30:00",
+      fiWork: "17:30:00",
+      checkIn: "08:30:00",
+      checkOut: "17:30:00",
+      checkInDate: new Date(),
+      refreshToken: "",
+      checkInToken: "0000",
+      isCheckedIn: false,
+      secretKey: "",
+      isActive: false,
     };
 
     const roleAdmin = await roleRepository.findOne({

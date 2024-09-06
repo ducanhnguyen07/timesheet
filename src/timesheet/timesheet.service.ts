@@ -4,7 +4,7 @@ import { UpdateTimesheetDto } from './dto/request/update-timesheet.dto';
 import { ResponseTimesheetDto } from './dto/response/response-timesheet-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Timesheet } from './entities/timesheet.entity';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { Task } from '../task/entities/task.entity';
 import { plainToInstance } from 'class-transformer';
 import { DeleteTimesheetDto } from './dto/response/delete-timesheet-dto';
@@ -28,9 +28,10 @@ export class TimesheetService {
     createTimesheetDto: CreateTimesheetDto,
   ): Promise<ResponseTimesheetDto | string> {
     try {
-      const newTimesheet = await this.timesheetRepository.save(
-        createTimesheetDto,
-      );
+      const newTimesheet = await this.timesheetRepository.save({
+        ...createTimesheetDto,
+        task: createTimesheetDto.taskId as DeepPartial<Task>,
+      });
 
       const responseTimesheet = plainToInstance(
         ResponseTimesheetDto,
@@ -125,7 +126,7 @@ export class TimesheetService {
         const projects = await this.projectRepository
           .createQueryBuilder('project')
           .innerJoin('project.tasks', 'task')
-          .where(`task.userId = "userId"`, { userId })
+          .where('task.id = :taskId', { taskId })
           .getOne();
 
         for (const item of timesheet) {
@@ -155,29 +156,35 @@ export class TimesheetService {
     }
   }
 
-  async findOne(id: string): Promise<ResponseTimesheetDto | string> {
+  async findOne(id: string) {
     try {
       const timesheet = await this.timesheetRepository.findOne({
-        where: {
-          id: id,
-        },
+        where: { id: id },
+        relations: ['task'],
       });
 
-      const task = await this.taskRepository.findOne({
-        where: {
-          id: timesheet.taskId,
-        },
-      });
+      const task = timesheet.task;
 
-      const responseTimesheet = plainToInstance(
+      const taskId: string = timesheet.task.id;
+
+      const project = await this.projectRepository
+        .createQueryBuilder('project')
+        .innerJoin('project.tasks', 'task')
+        .where(`task.id = :taskId`, { taskId })
+        .getOne();
+      
+      const responseTimesheet = {};
+      responseTimesheet['timesheet'] = plainToInstance(
         ResponseTimesheetDto,
         timesheet,
         {
           excludeExtraneousValues: true,
         },
       );
-      responseTimesheet.taskName = task.name;
-
+      responseTimesheet['taskName'] = task.name;
+      responseTimesheet['taskId'] = task.id;
+      responseTimesheet['projectName'] = project.name;
+      
       return responseTimesheet;
     } catch (error) {
       console.log(error);

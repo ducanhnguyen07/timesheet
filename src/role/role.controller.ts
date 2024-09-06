@@ -12,7 +12,7 @@ import {
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/request/create-role.dto';
 import { ResponseRoleDto } from './dto/response/response-role.dto';
-import { RolesPermissionsGuard } from 'src/auth/guard/role-permission.guard';
+import { RolesPermissionsGuard } from '../../src/auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { IRolePermission } from '../../src/common/interface/role-permission.interface';
 import { LoggerService } from '../../src/logging/log.service';

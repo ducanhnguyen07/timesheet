@@ -16,12 +16,14 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerConfig } from './configs/throttler.config';
-import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './mail/email.module';
 import { LoggerService } from './logging/log.service';
 import { LoggingInterceptor } from './common/intercepter/logging.interceptor';
-
+import { RedisService } from './redis/redis.service';
+import { KafkaModule } from './kafka/kafka.module';
+import { DiscordService } from './discord/discord.service';
+import { DiscordConsumer } from './kafka/discord.consumer';
 
 @Module({
   imports: [
@@ -35,11 +37,11 @@ import { LoggingInterceptor } from './common/intercepter/logging.interceptor';
     RequestModule,
     AuthModule,
     EmailModule,
+    KafkaModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     ThrottlerModule.forRootAsync(ThrottlerConfig),
-    CacheModule.register({ isGlobal: true }),
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
@@ -60,6 +62,9 @@ import { LoggingInterceptor } from './common/intercepter/logging.interceptor';
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
+    RedisService,
+    DiscordService,
+    DiscordConsumer,
   ],
 })
 export class AppModule {}

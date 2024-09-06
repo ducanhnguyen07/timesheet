@@ -42,4 +42,21 @@ export class ResponseUserDto {
   @IsString()
   @ApiProperty()
   avatar: string
+
+  @Expose()
+  @IsString()
+  @ApiProperty()
+  checkIn: string;
+  
+  @Expose()
+  @IsString()
+  @ApiProperty()
+  checkOut: string;
+
+  @Expose()
+  @ApiProperty()
+  checkInDate: Date;
+
+  @Expose()
+  isActive: boolean
 }

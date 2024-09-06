@@ -11,16 +11,16 @@ import {
   UseInterceptors,
   UploadedFile,
   ParseFilePipe,
-  CacheTTL,
   Header,
   Res,
+  Inject,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/request/create-user.dto';
 import { UpdateUserDto } from './dto/request/update-user.dto';
 import { ResponseUserDto } from './dto/response/response-user-dto';
 import { ResponseTaskDto } from '../task/dto/response/response-task-dto';
-import { RolesPermissionsGuard } from 'src/auth/guard/role-permission.guard';
+import { RolesPermissionsGuard } from '../../src/auth/guard/role-permission.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -28,8 +28,7 @@ import {
   FileConfig,
 } from '../common/constant/upload-file.constant';
 import { SkipThrottle } from '@nestjs/throttler';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { RequestUser, ResponseMessage } from 'decorator/customize';
+import { Public, RequestUser, ResponseMessage } from '../../decorator/customize';
 import { Response } from 'express';
 import { multerConfig } from '../../src/configs/upload-multer.config';
 import { LoggerService } from '../../src/logging/log.service';
@@ -119,8 +118,6 @@ export class UserController {
   @SetMetadata('permissions', ['user_read'])
   @Get('working-time/:id')
   @SkipThrottle({ default: true })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(30)
   @ResponseMessage('Get working-time!')
   getWorkingTime(@Param('id') id: string): Promise<number | string> {
     return this.userService.getWorkingTime(id);
@@ -128,7 +125,7 @@ export class UserController {
 
   @SetMetadata('permissions', ['user_read_own_timesheet'])
   @Get('working-time/my-working-time/get-time')
-  @ResponseMessage('Get working-time!')
+  @ResponseMessage('Get own working-time!')
   getOwnWorkingTime(@RequestUser() user: any): Promise<number> {
     return this.userService.getOwnWorkingTime(user);
   }
@@ -160,5 +157,29 @@ export class UserController {
     file: Express.Multer.File,
   ) {
     return this.userService.importExcelFile(file);
+  }
+
+  @SetMetadata('permissions', ['user_read_own_timesheet'])
+  @Post('attend/check-in')
+  @ResponseMessage('Handle check in')
+  async handleCheckIn(
+    @RequestUser() user: any,
+    @Body('checkInToken') checkInToken: string,
+  ) {
+    return this.userService.handleCheckIn(user, checkInToken);
+  }
+
+  @Public()
+  @Get('attend/reset')
+  @ResponseMessage('Reset check in')
+  async handleResetCheckIn() {
+    return this.userService.handleResetCheckIn();
+  }
+
+  /* Test */
+  @Public()
+  @Get('/test-server/host')
+  async testServer() {
+    return 200;
   }
 }

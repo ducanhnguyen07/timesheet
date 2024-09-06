@@ -19,7 +19,13 @@ export class Timesheet extends BaseEntity {
   @Column({ name: 'workingTime' })
   workingTime: number
 
+  @Column({ name: 'logTime', default: () => 'CURRENT_TIMESTAMP', })
+  logTime: Date
+
+  @Column({ name: 'taskId' })
+  taskId: string
+
   @ManyToOne(() => Task, task => task.timesheets, { cascade: true })
   @JoinColumn({ name: 'taskId' })
-  taskId: string;
+  task: Task
 }

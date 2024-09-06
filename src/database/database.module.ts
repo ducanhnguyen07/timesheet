@@ -26,8 +26,8 @@ import { User } from '../user/entities/user.entity';
         host: configService.getOrThrow('DATABASE_HOST'),
         port: configService.getOrThrow('DATABASE_PORT'),
         database: configService.getOrThrow('DATABASE'),
-        username: configService.getOrThrow('DATABASE_USERNAME'),
-        password: configService.getOrThrow('DATABASE_PASSWORD'),
+        username: configService.getOrThrow('POSTGRES_USER'),
+        password: configService.getOrThrow('POSTGRES_PASSWORD'),
         autoLoadEntities: true,
         synchronize: false,
       }),
@@ -35,4 +35,4 @@ import { User } from '../user/entities/user.entity';
     }),
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }

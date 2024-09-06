@@ -5,7 +5,7 @@ export default class DeleteSeeder {
     await dataSource
       .createQueryBuilder()
       .delete()
-      .from('timesheet')
+      .from('permission')
       .execute();
   }
 }

@@ -18,17 +18,17 @@ import { Project } from '../project/entities/project.entity';
 import { ResponseTaskDto } from '../task/dto/response/response-task-dto';
 import { PaginationHelper } from '../helper/pagination.helper';
 import { Role } from '../role/entities/role.entity';
-import { Cache } from 'cache-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Workbook } from 'exceljs';
 import * as tmp from 'tmp';
 import * as XLSX from 'xlsx';
 import * as fs from 'fs';
 import { USER_PASSWORD_DEFAULT } from '../common/constant/upload-file.constant';
 import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryResponse } from 'src/configs/cloudinary.response';
+import { CloudinaryResponse } from '../../src/configs/cloudinary.response';
 import RolePermission from '../../src/common/constant/role-permission.constant';
-const streamifier = require('streamifier');
+import { DiscordService } from '../../src/discord/discord.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { Timesheet } from '../../src/timesheet/entities/timesheet.entity';
 
 @Injectable()
 export class UserService {
@@ -41,13 +41,16 @@ export class UserService {
     private readonly projectRepository: Repository<Project>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Task>,
-
-    @Inject(CACHE_MANAGER) private cacheService: Cache,
+    @InjectRepository(Timesheet)
+    private readonly timesheetRepository: Repository<Timesheet>,
 
     private readonly paginationHelper: PaginationHelper,
+
+    private discordService: DiscordService,
   ) {}
 
   private readonly logger = new Logger(UserService.name);
+  private readonly adminSeedEmail: string = process.env.ADMIN_SEED_EMAIL;
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -199,7 +202,7 @@ export class UserService {
 
   getOwnPermission = async (user: any) => {
     const userPermission: number = user.roles;
-    
+
     return RolePermission[userPermission];
   };
 
@@ -240,14 +243,6 @@ export class UserService {
 
   getWorkingTime = async (id: string): Promise<number | string> => {
     try {
-      const cacheKey = `workingTime`;
-      const cachedTime = await this.cacheService.get<number>(cacheKey);
-
-      if (cachedTime !== undefined && cachedTime !== null) {
-        console.log('Returning cached working time!');
-        return cachedTime;
-      }
-
       const timesheets = await this.userRepository
         .createQueryBuilder('user')
         .innerJoinAndSelect('user.tasks', 'task')
@@ -266,8 +261,6 @@ export class UserService {
         }
       }, 0);
 
-      await this.cacheService.set(cacheKey, workingTime);
-
       return workingTime;
     } catch (error) {
       console.log(error);
@@ -278,19 +271,24 @@ export class UserService {
   getOwnWorkingTime = async (user: any): Promise<number> => {
     try {
       const userId: string = user.id;
-      const timesheetList = await this.userRepository
+      const currUser = await this.userRepository
         .createQueryBuilder('user')
         .innerJoinAndSelect('user.tasks', 'task')
-        .innerJoinAndSelect('task.timesheets', 'timesheet')
         .where('user.id = :userId', { userId })
-        .getMany()
-        .then((tasks) =>
-          tasks.flatMap((task) => task.tasks.flatMap((task) => task.timesheets)),
-        );
+        .getOne()
+      
+      const taskList = currUser['tasks'].map(task => task.id);
+      const timesheetList = [];
+      for (const taskId of taskList) {
+        const timesheet = await this.timesheetRepository.find({
+          where: { taskId: taskId }
+        });
+        timesheet.forEach(ts => timesheetList.push(ts));
+      }
 
       let workingTime: number = 0;
       for (const timesheet of timesheetList) {
-        if(timesheet.status == 1) {
+        if (timesheet.status == 1) {
           workingTime += timesheet.workingTime;
         }
       }
@@ -433,9 +431,7 @@ export class UserService {
     }
   };
 
-  findUserByToken = async (
-    refreshToken: string,
-  ): Promise<User | undefined> => {
+  findUserByToken = async (refreshToken: string): Promise<User | undefined> => {
     const userByToken = await this.userRepository.findOne({
       where: {
         refreshToken: refreshToken,
@@ -443,6 +439,72 @@ export class UserService {
     });
     return userByToken;
   };
+
+  handleCheckIn = async (user: any, checkInToken: string) => {
+    try {
+      const userId: string = user.id;
+      const checkInUser = await this.userRepository.findOne({
+        where: { id: userId }
+      });
+
+      if (checkInToken === checkInUser.checkInToken) {
+        const date = new Date();
+        const newCheckIn = this.formatCITime(date);
+
+        if(!checkInUser.isCheckedIn) {
+          checkInUser.checkIn = newCheckIn;
+          checkInUser.isCheckedIn = true;
+        } else {
+          checkInUser.checkOut = newCheckIn;
+        }
+        const responseUser = await this.userRepository.save(checkInUser);
+        
+        const message = `Successfully check in ${newCheckIn}`;
+        this.discordService.sendDirectMessage(message);
+        return {
+          user: plainToInstance(ResponseUserDto, responseUser, {
+            excludeExtraneousValues: true,
+          }),
+          status: true,
+        };
+      } else {
+        return {
+          user: plainToInstance(ResponseUserDto, checkInUser, {
+            excludeExtraneousValues: true,
+          }),
+          status: false,
+        };
+      }      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  @Cron(CronExpression.EVERY_DAY_AT_7AM, { name: 'send mail to user' })
+  async handleResetCheckIn() {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email: this.adminSeedEmail }
+      });
+
+      const lateTime = this.getSubTime(user.checkIn, user.stWork);
+      const earlyTime = this.getSubTime(user.fiWork, user.checkOut);
+      const checkInDate = this.formatCIDate(user.checkInDate);
+
+      // reset ci/co user info
+      user.checkIn = user.stWork;
+      user.checkOut = user.stWork;
+      user.isCheckedIn = false;
+      user.checkInDate = new Date();
+
+      await this.userRepository.save(user);
+
+      const message: string = `In ${checkInDate}, you check in late ${lateTime} and check out early ${earlyTime}`;
+      this.discordService.sendDirectMessage(message);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   getHashPassword = (plain: string): string => {
     const salt = genSaltSync(10);
@@ -452,5 +514,28 @@ export class UserService {
 
   isValidPassword = (plain: string, hash: string): boolean => {
     return compareSync(plain, hash);
+  };
+
+  formatCITime = (date: Date) => {
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  formatCIDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  getSubTime = (date1: string, date2: string): number => {
+    const arr1: number[] = date1.split(':').map((i) => parseInt(i));
+    const arr2: number[] = date2.split(':').map((i) => parseInt(i));
+
+    return (arr1[0] - arr2[0]) * 60 + (arr1[1] - arr2[1]);
   };
 }

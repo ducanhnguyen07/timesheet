@@ -1,5 +1,5 @@
-import { Expose, Transform } from "class-transformer";
-import { IsNumber, IsString, IsUUID } from "class-validator";
+import { Expose, Transform, Type } from "class-transformer";
+import { IsDate, IsNumber, IsString, IsUUID } from "class-validator";
 import { StatusConstant } from "../../../../src/common/constant/status.constant";
 import { ApiProperty } from "@nestjs/swagger";
 
@@ -18,6 +18,12 @@ export class CreateTimesheetDto {
   @IsNumber()
   @ApiProperty()
   workingTime: number
+
+  @Expose()
+  @IsDate()
+  @Type(() => Date)
+  @ApiProperty()
+  logTime: Date
 
   @Expose()
   @IsUUID('all', { each: true })

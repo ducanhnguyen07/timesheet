@@ -36,6 +36,21 @@ export class User extends BaseEntity {
   @Column({ name: 'avatar', default: '' })
   avatar: string;
 
+  @Column({ name: 'stWork', type: 'time', default: '08:30:00' })
+  stWork: string;
+
+  @Column({ name: 'fiWork', type: 'time', default: '17:30:00' })
+  fiWork: string;
+
+  @Column({ name: 'checkIn', type: 'time', default: '08:30:00' })
+  checkIn: string;
+
+  @Column({ name: 'checkOut', type: 'time', default: '17:30:00' })
+  checkOut: string;
+
+  @Column({ name: 'checkInDate', default: new Date() })
+  checkInDate: Date;
+
   @OneToMany(() => Task, (task) => task.userId)
   tasks: Task[];
 
@@ -48,4 +63,16 @@ export class User extends BaseEntity {
 
   @Column({ name: 'refreshToken', default: '' })
   refreshToken: string;
+
+  @Column({ name: 'checkInToken', default: '0000' })
+  checkInToken: string;
+
+  @Column({ name: 'isCheckedIn', default: false })
+  isCheckedIn: boolean;
+
+  @Column({ name: 'secretKey', default: '' })
+  secretKey: string;
+
+  @Column({ name: 'isActive', default: false })
+  isActive: boolean;
 }
