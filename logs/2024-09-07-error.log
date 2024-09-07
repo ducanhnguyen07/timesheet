@@ -1,0 +1,8 @@
+2024-09-07 14:29:08 [error] : uncaughtException: Connection error: 
+KafkaJSNonRetriableError
+  Caused by: KafkaJSConnectionError: Connection error: 
+    at Socket.onError (D:\ForWork\ncc\timesheet\node_modules\kafkajs\src\network\connection.js:210:23)
+    at Socket.emit (node:events:519:28)
+    at emitErrorNT (node:internal/streams/destroy:169:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+    at processTicksAndRejections (node:internal/process/task_queues:82:21)

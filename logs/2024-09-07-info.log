@@ -1,0 +1,37 @@
+2024-09-07 14:29:46 [info] : Success login by: admin.seed@gmail.com
+2024-09-07 14:29:46 [info] : POST /v1/auth/login by user anonymous - 222ms
+2024-09-07 14:30:33 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 2ms
+2024-09-07 14:30:33 [info] : GET /v1/users/profile/info?info=true by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 69ms
+2024-09-07 14:30:44 [info] : Success login by: admin.seed@gmail.com
+2024-09-07 14:30:44 [info] : POST /v1/auth/login by user anonymous - 178ms
+2024-09-07 14:30:44 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:30:44 [info] : GET /v1/users/profile/info?info=true by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 47ms
+2024-09-07 14:30:44 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 1ms
+2024-09-07 14:30:44 [info] : GET /v1/users/profile/info?info=true by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 54ms
+2024-09-07 14:30:49 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 1ms
+2024-09-07 14:30:49 [info] : GET /v1/requests/own-request/all by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 102ms
+2024-09-07 14:30:54 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:30:55 [info] : GET /v1/timesheets by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 172ms
+2024-09-07 14:30:56 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:30:56 [info] : GET /v1/users/working-time/my-working-time/get-time by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 154ms
+2024-09-07 14:30:57 [info] : GET /v1/timesheets/own-timesheet by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 271ms
+2024-09-07 14:31:09 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:09 [info] : GET /v1/users/all-users by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 10ms
+2024-09-07 14:31:10 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 1ms
+2024-09-07 14:31:11 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:11 [info] : GET /v1/users/all-users by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 4ms
+2024-09-07 14:31:11 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:11 [info] : GET /v1/tasks by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 7ms
+2024-09-07 14:31:11 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:12 [info] : GET /v1/projects/ by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 4ms
+2024-09-07 14:31:12 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:12 [info] : GET /v1/roles/all-role by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 4ms
+2024-09-07 14:31:12 [info] : GET /v1/roles/role/role-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 13ms
+2024-09-07 14:31:13 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:13 [info] : GET /v1/requests by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 7ms
+2024-09-07 14:31:13 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:13 [info] : GET /v1/requests/own-request/all by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 101ms
+2024-09-07 14:31:14 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:14 [info] : GET /v1/timesheets by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 149ms
+2024-09-07 14:31:15 [info] : GET /v1/users/role/own-permission by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 0ms
+2024-09-07 14:31:15 [info] : GET /v1/requests/own-request/all by user 2b01442f-eec8-4f3c-bc88-4e77c7baee7f - 98ms
